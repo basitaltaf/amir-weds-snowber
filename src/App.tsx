@@ -24,7 +24,7 @@ import { Memorial } from './components/Memorial'
 import { AdminDashboard } from './components/AdminDashboard'
 import { BottomNav } from './components/BottomNav'
 import { ThemeToggle } from './components/ThemeToggle'
-import { settingsApi, visitsApi, DEFAULT_CONFIG } from './lib/supabase'
+import { settingsApi, visitsApi, isSupabaseConfigured, supabase, DEFAULT_CONFIG } from './lib/supabase'
 import type { WeddingConfig } from './lib/supabase'
 
 function App() {
@@ -47,6 +47,19 @@ function App() {
       }
     }
     loadSettings()
+
+    if (isSupabaseConfigured && supabase) {
+      const channel = supabase
+        .channel('public:settings')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'settings' }, () => {
+          loadSettings()
+        })
+        .subscribe()
+
+      return () => {
+        supabase?.removeChannel(channel)
+      }
+    }
   }, [])
 
   // Tracking logic

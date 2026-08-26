@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine, RiCamera2Line, RiUploadCloud2Line } from 'react-icons/ri'
 import type { TranslationSet } from '../lib/translations'
-import { guestUploadsApi } from '../lib/supabase'
+import { guestUploadsApi, supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { GuestUpload } from '../lib/supabase'
 
 interface GalleryProps {
@@ -44,6 +44,18 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
       }
     }
     fetchUploads()
+
+    if (isSupabaseConfigured && supabase) {
+      const channel = supabase
+        .channel('public:guest_uploads')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'guest_uploads' }, () => {
+          fetchUploads()
+        })
+        .subscribe()
+      return () => {
+        supabase?.removeChannel(channel)
+      }
+    }
   }, [])
 
   const openLightbox = (idx: number) => {

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RiChatHeartFill, RiSendPlaneFill, RiLoader4Line } from 'react-icons/ri'
 import type { TranslationSet } from '../lib/translations'
-import { guestbookApi } from '../lib/supabase'
+import { guestbookApi, supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { GuestbookEntry } from '../lib/supabase'
 
 interface GuestbookProps {
@@ -55,6 +55,17 @@ export const Guestbook: React.FC<GuestbookProps> = ({ t, onBlessingSuccess }) =>
 
   useEffect(() => {
     fetchEntries()
+    if (isSupabaseConfigured && supabase) {
+      const channel = supabase
+        .channel('public:guestbook')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'guestbook' }, () => {
+          fetchEntries()
+        })
+        .subscribe()
+      return () => {
+        supabase?.removeChannel(channel)
+      }
+    }
   }, [])
 
   const playSuccessChime = () => {

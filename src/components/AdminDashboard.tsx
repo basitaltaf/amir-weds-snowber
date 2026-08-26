@@ -94,6 +94,20 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
   useEffect(() => {
     if (isLoggedIn) {
       fetchData()
+
+      if (isSupabaseConfigured && supabase) {
+        const channel = supabase
+          .channel('admin-dashboard')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvp' }, () => fetchData())
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'guestbook' }, () => fetchData())
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'guest_uploads' }, () => fetchData())
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'visits' }, () => fetchData())
+          .subscribe()
+
+        return () => {
+          supabase?.removeChannel(channel)
+        }
+      }
     }
   }, [isLoggedIn])
 
