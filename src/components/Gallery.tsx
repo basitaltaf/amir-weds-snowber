@@ -78,9 +78,9 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
     const file = e.target.files?.[0]
     if (!file) return
     
-    // Limit file size to 2MB to fit comfortably in localStorage
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Image is too large! Please upload a file smaller than 2MB.")
+    // Limit file size to 20MB to fit comfortably in database
+    if (file.size > 20 * 1024 * 1024) {
+      alert("Image is too large! Please upload a file smaller than 20MB.")
       return
     }
     
@@ -469,7 +469,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                         <div className="flex flex-col items-center gap-1.5">
                           <RiUploadCloud2Line className="w-8 h-8 text-soft-gold group-hover:scale-110 transition-transform" />
                           <span className="text-[10px] text-navy/70 font-semibold">Click to select a photo</span>
-                          <span className="text-[8px] text-navy/40">JPEG, PNG up to 2MB</span>
+                          <span className="text-[8px] text-navy/40">JPEG, PNG up to 20MB</span>
                         </div>
                       )}
                     </div>
