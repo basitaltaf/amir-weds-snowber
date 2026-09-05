@@ -245,8 +245,14 @@ export const Guestbook: React.FC<GuestbookProps> = ({ t, onBlessingSuccess }) =>
           <div className="w-full space-y-4">
             <AnimatePresence initial={false}>
               {isLoading && entries.length === 0 ? (
-                <div className="flex justify-center items-center py-12">
-                  <RiLoader4Line className="w-8 h-8 animate-spin text-soft-gold" />
+                <div className="space-y-4 w-full">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="bg-navy/5 border border-soft-gold/15 p-6 rounded-2xl animate-pulse">
+                      <div className="h-4 bg-navy/10 rounded w-1/3 mb-4"></div>
+                      <div className="h-3 bg-navy/10 rounded w-full mb-2"></div>
+                      <div className="h-3 bg-navy/10 rounded w-2/3"></div>
+                    </div>
+                  ))}
                 </div>
               ) : entries.length === 0 ? (
                 <div className="text-center py-12 border border-dashed border-soft-gold/20 rounded-2xl bg-navy/5">

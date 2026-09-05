@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine, RiCamera2Line, RiUploadCloud2Line } from 'react-icons/ri'
+import { RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine, RiCamera2Line, RiUploadCloud2Line, RiCheckLine } from 'react-icons/ri'
 import type { TranslationSet } from '../lib/translations'
 import { guestUploadsApi, supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { GuestUpload } from '../lib/supabase'
@@ -17,6 +17,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
   
   // Guest uploads states
   const [guestUploads, setGuestUploads] = useState<GuestUpload[]>([])
+  const [isLoadingUploads, setIsLoadingUploads] = useState(true)
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [uploaderName, setUploaderName] = useState('')
   const [uploaderCaption, setUploaderCaption] = useState('')
@@ -24,7 +25,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [isUploadPrivate, setIsUploadPrivate] = useState(false)
-  const [activeGuestImg, setActiveGuestImg] = useState<{ src: string, label: string } | null>(null)
+  const [activeGuestImgIdx, setActiveGuestImgIdx] = useState<number | null>(null)
   const [isAllGuestsOpen, setIsAllGuestsOpen] = useState(false)
 
   const publicGuestUploads = guestUploads.filter(up => !up.isPrivate)
@@ -38,10 +39,12 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
 
   useEffect(() => {
     const fetchUploads = async () => {
+      setIsLoadingUploads(true)
       const res = await guestUploadsApi.list()
       if (res.success && res.data) {
         setGuestUploads(res.data)
       }
+      setIsLoadingUploads(false)
     }
     fetchUploads()
 
@@ -78,9 +81,9 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
     const file = e.target.files?.[0]
     if (!file) return
     
-    // Limit file size to 20MB to fit comfortably in database
-    if (file.size > 20 * 1024 * 1024) {
-      alert("Image is too large! Please upload a file smaller than 20MB.")
+    // Limit file size to 50MB to fit comfortably in database
+    if (file.size > 50 * 1024 * 1024) {
+      alert("Image is too large! Please upload a file smaller than 50MB.")
       return
     }
     
@@ -144,7 +147,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
   // Centralized body scroll locking hook for modals
   useEffect(() => {
     const lenis = (window as any).lenis
-    if (isAllGuestsOpen || isUploadOpen || activeImageIdx !== null || activeGuestImg !== null) {
+    if (isAllGuestsOpen || isUploadOpen || activeImageIdx !== null || activeGuestImgIdx !== null) {
       document.body.style.overflow = 'hidden'
       if (lenis) lenis.stop()
     } else {
@@ -155,7 +158,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
       document.body.style.overflow = ''
       if (lenis) lenis.start()
     }
-  }, [isAllGuestsOpen, isUploadOpen, activeImageIdx, activeGuestImg])
+  }, [isAllGuestsOpen, isUploadOpen, activeImageIdx, activeGuestImgIdx])
 
   const currentLang = document.documentElement.lang || 'en'
 
@@ -279,18 +282,23 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
               <div className="relative h-64 md:h-80 w-full max-w-[280px] md:max-w-sm mx-auto flex items-center justify-center">
                 
                 {/* Check if there are any uploads */}
-                {publicGuestUploads.length > 0 ? (
-                  publicGuestUploads.slice(0, 4).reverse().map((up, idx, arr) => {
-                    // Random-ish rotations based on index for the stack effect
+                {isLoadingUploads ? (
+                  <div className="absolute bg-ivory p-3 pb-12 sm:p-4 sm:pb-16 rounded-sm shadow-xl border border-gray-200 w-56 sm:w-64 aspect-[3/4] z-10 animate-pulse flex flex-col justify-between">
+                    <div className="w-full h-[85%] bg-navy/10 rounded-sm"></div>
+                    <div className="w-1/2 h-3 mx-auto bg-navy/10 mt-4 rounded-sm"></div>
+                  </div>
+                ) : publicGuestUploads.length > 0 ? (
+                  publicGuestUploads.slice(0, 4).reverse().map((up, reversedIdx, arr) => {
+                    const idx = publicGuestUploads.indexOf(up); // real index for lightbox
                     const rotations = [-6, 4, -2, 3];
-                    const isTop = idx === arr.length - 1;
+                    const isTop = reversedIdx === arr.length - 1;
                     return (
                       <motion.div
-                        key={up.id || idx}
+                        key={up.id || reversedIdx}
                         initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
-                        animate={{ opacity: 1, scale: 1, rotate: rotations[idx % 4] }}
+                        animate={{ opacity: 1, scale: 1, rotate: rotations[reversedIdx % 4] }}
                         whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
-                        onClick={() => setActiveGuestImg({ src: up.image_url, label: `${up.guest_name}: "${up.caption || ''}"` })}
+                        onClick={() => setActiveGuestImgIdx(idx)}
                         className={`absolute bg-ivory p-3 pb-12 sm:p-4 sm:pb-16 rounded-sm shadow-xl border border-gray-200 cursor-pointer transition-all duration-300 w-56 sm:w-64 aspect-[3/4] ${isTop ? 'z-10' : 'z-0'}`}
                         style={{ transformOrigin: 'center bottom' }}
                       >
@@ -399,7 +407,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                             key={up.id || idx}
                             className="relative aspect-square rounded-xl overflow-hidden border border-soft-gold/15 cursor-pointer group"
                             onClick={() => {
-                              setActiveGuestImg({ src: up.image_url, label: `${up.guest_name}: "${up.caption || ''}"` })
+                              setActiveGuestImgIdx(idx)
                             }}
                           >
                             <img src={up.image_url} alt={up.guest_name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -469,7 +477,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                         <div className="flex flex-col items-center gap-1.5">
                           <RiUploadCloud2Line className="w-8 h-8 text-soft-gold group-hover:scale-110 transition-transform" />
                           <span className="text-[10px] text-navy/70 font-semibold">Click to select a photo</span>
-                          <span className="text-[8px] text-navy/40">JPEG, PNG up to 20MB</span>
+                          <span className="text-[8px] text-navy/40">JPEG, PNG up to 50MB</span>
                         </div>
                       )}
                     </div>
@@ -622,19 +630,39 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
         {/* Guest Image Lightbox */}
         {createPortal(
           <AnimatePresence>
-            {activeGuestImg !== null && (
+            {activeGuestImgIdx !== null && publicGuestUploads[activeGuestImgIdx] && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-navy/95 z-55 flex items-center justify-center p-4 select-none"
-                onClick={() => setActiveGuestImg(null)}
+                onClick={() => setActiveGuestImgIdx(null)}
               >
                 <button
-                  onClick={() => setActiveGuestImg(null)}
+                  onClick={() => setActiveGuestImgIdx(null)}
                   className="absolute top-6 right-6 text-ivory/80 hover:text-soft-gold p-2 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all z-50"
                 >
                   <RiCloseLine className="w-6 h-6" />
+                </button>
+                
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setActiveGuestImgIdx((prev) => prev !== null ? (prev - 1 + publicGuestUploads.length) % publicGuestUploads.length : null)
+                  }}
+                  className="absolute left-4 sm:left-10 text-ivory/60 hover:text-soft-gold p-2 md:p-3 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all z-50"
+                >
+                  <RiArrowLeftSLine className="w-6 h-6 md:w-8 md:h-8" />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setActiveGuestImgIdx((prev) => prev !== null ? (prev + 1) % publicGuestUploads.length : null)
+                  }}
+                  className="absolute right-4 sm:right-10 text-ivory/60 hover:text-soft-gold p-2 md:p-3 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all z-50"
+                >
+                  <RiArrowRightSLine className="w-6 h-6 md:w-8 md:h-8" />
                 </button>
 
                 <motion.div
@@ -645,12 +673,12 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <img
-                    src={activeGuestImg.src}
+                    src={publicGuestUploads[activeGuestImgIdx].image_url}
                     alt="Guest Upload"
                     className="max-w-full max-h-[70dvh] object-contain rounded-2xl border border-soft-gold/20 shadow-2xl"
                   />
                   <p className="font-playfair text-ivory/90 tracking-widest text-center italic mt-4 text-sm">
-                    {activeGuestImg.label}
+                    {publicGuestUploads[activeGuestImgIdx].guest_name}: "{publicGuestUploads[activeGuestImgIdx].caption || ''}"
                   </p>
                 </motion.div>
               </motion.div>

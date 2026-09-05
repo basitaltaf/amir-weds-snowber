@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion'
+import { RiArrowLeftLine, RiWifiOffLine } from 'react-icons/ri'
 import Lenis from 'lenis'
 import { translations } from './lib/translations'
 import type { Language } from './lib/translations'
@@ -29,10 +30,11 @@ import type { WeddingConfig } from './lib/supabase'
 
 function App() {
   const language: Language = 'en'
-  const [isOpened, setIsOpened] = useState(false)
+  const [isOpened, setIsOpened] = useState(() => sessionStorage.getItem('isOpened') === 'true')
   const [playMusic, setPlayMusic] = useState(false)
   const [burstPetals, setBurstPetals] = useState(false)
-  const [guestName, setGuestName] = useState<string | null>(null)
+  const [guestName, setGuestName] = useState<string | null>(() => sessionStorage.getItem('guestName'))
+  const [showSlowNetworkWarning, setShowSlowNetworkWarning] = useState(false)
   const [currentView, setCurrentView] = useState<'invite' | 'admin'>(
     window.location.hash === '#/admin' ? 'admin' : 'invite'
   )
@@ -40,10 +42,34 @@ function App() {
 
   // Fetch customizable details on mount
   useEffect(() => {
+    // Guest Link Parsing
+    const params = new URLSearchParams(window.location.search)
+    let rawGuest = params.get('guest')
+    if (rawGuest) {
+      try {
+        rawGuest = decodeURIComponent(rawGuest.replace(/\+/g, ' ')).trim()
+      } catch (e) {
+        // Fallback silently
+      }
+    }
+    if (rawGuest && rawGuest.length > 0) {
+      setGuestName(rawGuest)
+      sessionStorage.setItem('guestName', rawGuest)
+    }
+
+    const startTime = Date.now()
     const loadSettings = async () => {
       const res = await settingsApi.fetch()
       if (res.success && res.data) {
         setConfig(res.data)
+      }
+      
+      // Slow internet warning
+      const fetchTime = Date.now() - startTime
+      const connection = (navigator as any).connection
+      if (fetchTime > 3000 || (connection && (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g'))) {
+        setShowSlowNetworkWarning(true)
+        setTimeout(() => setShowSlowNetworkWarning(false), 8000)
       }
     }
     loadSettings()
@@ -86,9 +112,8 @@ function App() {
           console.warn('Geolocation failed');
         }
 
-        // Get guest name from URL
-        const params = new URLSearchParams(window.location.search);
-        const name = params.get('guest') || 'Unknown Guest';
+        // Get guest name from state or session
+        const name = sessionStorage.getItem('guestName') || 'Unknown Guest';
 
         await visitsApi.record({
           guest_name: name,
@@ -193,6 +218,14 @@ function App() {
 
   const handleOpenInvitation = () => {
     setIsOpened(true)
+    sessionStorage.setItem('isOpened', 'true')
+  }
+
+  const handleGoBack = () => {
+    setIsOpened(false)
+    sessionStorage.removeItem('isOpened')
+    setPlayMusic(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const t = translations[language]
@@ -209,6 +242,32 @@ function App() {
       {/* Floating Controllers (Visible globally) */}
       <MusicPlayer config={config} playRequested={playMusic} />
       {isOpened && <ThemeToggle />}
+      
+      {/* Back Button */}
+      {isOpened && (
+        <button
+          onClick={handleGoBack}
+          className="fixed top-4 left-4 z-50 p-2 md:p-3 bg-white/20 backdrop-blur-md rounded-full text-navy shadow-lg border border-white/30 hover:bg-white/40 hover:scale-105 transition-all duration-300"
+          aria-label="Go back to envelope"
+        >
+          <RiArrowLeftLine className="w-5 h-5 md:w-6 md:h-6" />
+        </button>
+      )}
+
+      {/* Slow Network Banner */}
+      <AnimatePresence>
+        {showSlowNetworkWarning && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-amber-200 flex items-center gap-2"
+          >
+            <RiWifiOffLine className="text-amber-500 w-4 h-4" />
+            <span className="text-xs text-navy font-medium">Slow connection. Media may take longer to load.</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Gold Top Scroll Progress bar (Fades & follows reading progress) */}
       {isOpened && (
