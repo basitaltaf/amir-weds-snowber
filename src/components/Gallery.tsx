@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine, RiCamera2Line, RiUploadCloud2Line, RiCheckLine } from 'react-icons/ri'
+import { RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine, RiCamera2Line, RiUploadCloud2Line } from 'react-icons/ri'
 import type { TranslationSet } from '../lib/translations'
 import { guestUploadsApi, supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { GuestUpload } from '../lib/supabase'
