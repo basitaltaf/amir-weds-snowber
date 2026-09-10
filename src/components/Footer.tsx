@@ -67,19 +67,19 @@ export const Footer: React.FC<FooterProps> = ({ config }) => {
 
         {/* Islamic Marriage Blessing */}
         <div className="flex flex-col items-center max-w-xl mb-6 select-none">
-          {/* Arabic Dua */}
-          <p className="font-serif text-xl sm:text-2xl text-soft-gold mb-3.5 leading-relaxed text-center" dir="rtl">
-            بَارَكَ اللَّهُ لَكَ، وَبَارَكَ عَلَيْكَ، وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
+          {/* Arabic Verse */}
+          <p className="font-serif text-2xl sm:text-3xl text-soft-gold mb-3.5 leading-relaxed text-center" dir="rtl">
+            هُنَّ لِبَاسٌۭ لَّكُمْ وَأَنتُمْ لِبَاسٌۭ لَّهُنَّ ۗ
           </p>
           
           {/* Translation */}
           <p className="font-lora text-xs sm:text-sm text-navy/70 italic text-center mb-1 leading-relaxed max-w-md px-4">
-            “May Allah bless you, shower His blessings upon you, and bring you together in goodness.”
+            "They are a garment for you and you are a garment for them."
           </p>
           
           {/* Citation Source */}
           <span className="font-inter text-[8px] tracking-widest text-navy/50 uppercase block mt-1">
-            — Sunan Abi Dawud & Jami’ at-Tirmidhi
+            — Surah Al-Baqarah (2:187)
           </span>
         </div>
 
