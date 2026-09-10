@@ -31,7 +31,7 @@ import type { WeddingConfig } from './lib/supabase'
 function App() {
   const language: Language = 'en'
   const [isOpened, setIsOpened] = useState(() => sessionStorage.getItem('isOpened') === 'true')
-  const [playMusic, setPlayMusic] = useState(false)
+  const [playMusic, setPlayMusic] = useState(() => sessionStorage.getItem('isOpened') === 'true')
   const [burstPetals, setBurstPetals] = useState(false)
   const [guestName, setGuestName] = useState<string | null>(() => sessionStorage.getItem('guestName'))
   const [showSlowNetworkWarning, setShowSlowNetworkWarning] = useState(false)
@@ -67,9 +67,9 @@ function App() {
       // Slow internet warning
       const fetchTime = Date.now() - startTime
       const connection = (navigator as any).connection
-      if (fetchTime > 3000 || (connection && (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g'))) {
+      if (fetchTime > 10000 || (connection && (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g'))) {
         setShowSlowNetworkWarning(true)
-        setTimeout(() => setShowSlowNetworkWarning(false), 8000)
+        setTimeout(() => setShowSlowNetworkWarning(false), 10000)
       }
     }
     loadSettings()
@@ -261,10 +261,16 @@ function App() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-amber-200 flex items-center gap-2"
+            drag="y"
+            dragConstraints={{ top: -50, bottom: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_, info) => {
+              if (info.offset.y < -20) setShowSlowNetworkWarning(false)
+            }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-amber-200 flex items-center gap-2 cursor-grab active:cursor-grabbing w-11/12 max-w-sm sm:max-w-md md:w-auto"
           >
-            <RiWifiOffLine className="text-amber-500 w-4 h-4" />
-            <span className="text-xs text-navy font-medium">Slow connection. Media may take longer to load.</span>
+            <RiWifiOffLine className="text-amber-500 w-5 h-5 flex-shrink-0" />
+            <span className="text-xs text-navy font-medium leading-tight">Slow connection. Media may take longer to load. (Swipe up to dismiss)</span>
           </motion.div>
         )}
       </AnimatePresence>

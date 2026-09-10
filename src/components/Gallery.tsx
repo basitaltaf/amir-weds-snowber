@@ -27,6 +27,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
   const [isUploadPrivate, setIsUploadPrivate] = useState(false)
   const [activeGuestImgIdx, setActiveGuestImgIdx] = useState<number | null>(null)
   const [isAllGuestsOpen, setIsAllGuestsOpen] = useState(false)
+  const [isAllOfficialOpen, setIsAllOfficialOpen] = useState(false)
 
   const publicGuestUploads = guestUploads.filter(up => !up.isPrivate)
 
@@ -147,7 +148,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
   // Centralized body scroll locking hook for modals
   useEffect(() => {
     const lenis = (window as any).lenis
-    if (isAllGuestsOpen || isUploadOpen || activeImageIdx !== null || activeGuestImgIdx !== null) {
+    if (isAllGuestsOpen || isAllOfficialOpen || isUploadOpen || activeImageIdx !== null || activeGuestImgIdx !== null) {
       document.body.style.overflow = 'hidden'
       if (lenis) lenis.stop()
     } else {
@@ -158,7 +159,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
       document.body.style.overflow = ''
       if (lenis) lenis.start()
     }
-  }, [isAllGuestsOpen, isUploadOpen, activeImageIdx, activeGuestImgIdx])
+  }, [isAllGuestsOpen, isAllOfficialOpen, isUploadOpen, activeImageIdx, activeGuestImgIdx])
 
   const currentLang = document.documentElement.lang || 'en'
 
@@ -262,7 +263,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
               {/* Action Buttons underneath the stack */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md px-6">
                 <button
-                  onClick={() => openLightbox(0)}
+                  onClick={() => setIsAllOfficialOpen(true)}
                   className="w-full py-3.5 bg-navy/5 backdrop-blur-sm text-navy rounded-full text-xs font-bold uppercase tracking-widest border border-soft-gold/30 shadow-sm hover:shadow-md hover:bg-navy/10 transition-all duration-300 flex items-center justify-center"
                 >
                   View Gallery ({images.length})
@@ -360,6 +361,63 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Browse all official photos grid modal */}
+        {createPortal(
+          <AnimatePresence>
+            {isAllOfficialOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-navy/90 backdrop-blur-md z-55 flex items-center justify-center p-4 select-none"
+                onClick={() => setIsAllOfficialOpen(false)}
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-ivory border border-soft-gold/30 rounded-2xl w-full max-w-2xl p-6 relative shadow-2xl flex flex-col gap-4 text-left max-h-[80dvh]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => setIsAllOfficialOpen(false)}
+                    className="absolute top-4 right-4 text-navy/60 hover:text-soft-gold cursor-pointer transition-all duration-300 z-50"
+                  >
+                    <RiCloseLine className="w-6 h-6" />
+                  </button>
+
+                  <div className="text-center pb-2 border-b border-soft-gold/15">
+                    <h3 className="font-playfair text-lg text-navy font-semibold">Official Memories</h3>
+                    <p className="text-[10px] text-navy/60 tracking-wider uppercase mt-1 font-semibold">Moments from our special day</p>
+                  </div>
+
+                  {/* Scrollable grid of uploads */}
+                  <div data-lenis-prevent className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4 pb-20">
+                      {images.map((img: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="relative aspect-square rounded-xl overflow-hidden border border-soft-gold/15 cursor-pointer group bg-gray-100"
+                          onClick={() => {
+                            setActiveImageIdx(idx)
+                          }}
+                        >
+                          <img src={img.src} alt={img.alt} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <div className="absolute inset-x-0 bottom-0 bg-black/50 p-1.5 text-center">
+                            <span className="text-[9px] text-ivory font-semibold block truncate">{img.alt || 'Official Memory'}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
 
         {/* Browse all guest clicks catalog popup modal */}
         {createPortal(
@@ -585,9 +643,9 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                     e.stopPropagation();
                     navigateLightbox('prev');
                   }}
-                  className="absolute left-6 text-ivory/80 hover:text-soft-gold p-3 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all duration-300 z-40"
+                  className="absolute left-4 sm:left-10 text-soft-gold hover:text-white p-2 md:p-3 bg-navy/80 rounded-full backdrop-blur-md border border-soft-gold/50 hover:border-soft-gold cursor-pointer transition-all shadow-xl z-50"
                 >
-                  <RiArrowLeftSLine className="w-6 h-6" />
+                  <RiArrowLeftSLine className="w-6 h-6 md:w-8 md:h-8" />
                 </button>
 
                 {/* Next Button */}
@@ -596,9 +654,9 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                     e.stopPropagation();
                     navigateLightbox('next');
                   }}
-                  className="absolute right-6 text-ivory/80 hover:text-soft-gold p-3 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all duration-300 z-40"
+                  className="absolute right-4 sm:right-10 text-soft-gold hover:text-white p-2 md:p-3 bg-navy/80 rounded-full backdrop-blur-md border border-soft-gold/50 hover:border-soft-gold cursor-pointer transition-all shadow-xl z-50"
                 >
-                  <RiArrowRightSLine className="w-6 h-6" />
+                  <RiArrowRightSLine className="w-6 h-6 md:w-8 md:h-8" />
                 </button>
 
                 {/* Lightbox Content Container */}
@@ -650,7 +708,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                     e.stopPropagation()
                     setActiveGuestImgIdx((prev) => prev !== null ? (prev - 1 + publicGuestUploads.length) % publicGuestUploads.length : null)
                   }}
-                  className="absolute left-4 sm:left-10 text-ivory/60 hover:text-soft-gold p-2 md:p-3 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all z-50"
+                  className="absolute left-4 sm:left-10 text-soft-gold hover:text-white p-2 md:p-3 bg-navy/80 rounded-full backdrop-blur-md border border-soft-gold/50 hover:border-soft-gold cursor-pointer transition-all shadow-xl z-50"
                 >
                   <RiArrowLeftSLine className="w-6 h-6 md:w-8 md:h-8" />
                 </button>
@@ -660,7 +718,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
                     e.stopPropagation()
                     setActiveGuestImgIdx((prev) => prev !== null ? (prev + 1) % publicGuestUploads.length : null)
                   }}
-                  className="absolute right-4 sm:right-10 text-ivory/60 hover:text-soft-gold p-2 md:p-3 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all z-50"
+                  className="absolute right-4 sm:right-10 text-soft-gold hover:text-white p-2 md:p-3 bg-navy/80 rounded-full backdrop-blur-md border border-soft-gold/50 hover:border-soft-gold cursor-pointer transition-all shadow-xl z-50"
                 >
                   <RiArrowRightSLine className="w-6 h-6 md:w-8 md:h-8" />
                 </button>

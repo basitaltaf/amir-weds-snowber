@@ -54,6 +54,10 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ playRequested, config 
         .catch((err) => {
           console.warn('Autoplay prevented by browser. Click to play.', err)
         })
+    } else if (!playRequested && audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      if (isMounted) setIsPlaying(false)
     }
     return () => {
       isMounted = false
