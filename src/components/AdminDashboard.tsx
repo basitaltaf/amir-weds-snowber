@@ -1079,7 +1079,7 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                                     gallery: tempConfig.gallery.filter((_, i) => i !== idx)
                                   })
                                 }}
-                                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-950/80 text-red-200 flex items-center justify-center hover:bg-red-900 border border-red-900/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-md"
+                                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-950/80 text-red-200 flex items-center justify-center hover:bg-red-900 border border-red-900/40 opacity-100 transition-opacity cursor-pointer shadow-md"
                               >
                                 <RiDeleteBin7Line className="w-3.5 h-3.5" />
                               </button>
