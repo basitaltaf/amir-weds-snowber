@@ -1,5 +1,7 @@
-import React from 'react'
-import { motion } from 'framer-motion'
+import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { RiCloseLine, RiZoomInLine } from 'react-icons/ri'
 import type { TranslationSet } from '../lib/translations'
 
 interface PortraitsProps {
@@ -8,6 +10,24 @@ interface PortraitsProps {
 }
 
 export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
+  const [activeImage, setActiveImage] = useState<'groom' | 'bride' | null>(null)
+  
+  // Body scroll lock
+  useEffect(() => {
+    const lenis = (window as any).lenis
+    if (activeImage) {
+      document.body.style.overflow = 'hidden'
+      if (lenis) lenis.stop()
+    } else {
+      document.body.style.overflow = ''
+      if (lenis) lenis.start()
+    }
+    return () => {
+      document.body.style.overflow = ''
+      if (lenis) lenis.start()
+    }
+  }, [activeImage])
+
   const currentLang = document.documentElement.lang || 'en'
   const groomLabel = currentLang === 'ur' ? 'دولہا' : 'Groom'
   const brideLabel = currentLang === 'ur' ? 'دلہن' : 'Bride'
@@ -48,13 +68,19 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
           <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {/* Groom Photo */}
             <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-navy/5 shadow-sm border border-soft-gold/20 relative group">
+              <div 
+                onClick={() => setActiveImage('groom')}
+                className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-navy/5 shadow-sm border border-soft-gold/20 relative group cursor-pointer"
+              >
                 <img 
                   src={groomImg} 
                   alt={groomLabel}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/10 transition-colors duration-300 flex items-center justify-center">
+                  <RiZoomInLine className="text-white w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md" />
+                </div>
                 <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl pointer-events-none mix-blend-overlay" />
               </div>
               <span className="font-cormorant text-soft-gold text-sm sm:text-base tracking-[0.15em] uppercase font-bold">
@@ -64,13 +90,19 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
 
             {/* Bride Photo */}
             <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-navy/5 shadow-sm border border-soft-gold/20 relative group">
+              <div 
+                onClick={() => setActiveImage('bride')}
+                className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-navy/5 shadow-sm border border-soft-gold/20 relative group cursor-pointer"
+              >
                 <img 
                   src={brideImg} 
                   alt={brideLabel}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/10 transition-colors duration-300 flex items-center justify-center">
+                  <RiZoomInLine className="text-white w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md" />
+                </div>
                 <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl pointer-events-none mix-blend-overlay" />
               </div>
               <span className="font-cormorant text-soft-gold text-sm sm:text-base tracking-[0.15em] uppercase font-bold">
@@ -101,6 +133,49 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
           </p>
         </motion.div>
       </div>
+
+      {/* Lightbox Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {activeImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-navy/95 z-[100] flex items-center justify-center p-4 select-none"
+              onClick={() => setActiveImage(null)}
+            >
+              <button
+                onClick={() => setActiveImage(null)}
+                className="absolute top-6 right-6 text-ivory/80 hover:text-soft-gold p-2 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all duration-300 z-50"
+              >
+                <RiCloseLine className="w-6 h-6" />
+              </button>
+
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="relative max-w-xl max-h-[85dvh] flex flex-col justify-center items-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={activeImage === 'groom' ? groomImg : brideImg}
+                  alt={activeImage === 'groom' ? groomLabel : brideLabel}
+                  className="max-w-full max-h-[75dvh] object-contain rounded-2xl border border-soft-gold/20 shadow-2xl"
+                />
+                
+                <p className="font-playfair text-ivory/90 tracking-widest uppercase text-center mt-6 text-sm sm:text-base font-bold">
+                  {activeImage === 'groom' ? groomLabel : brideLabel}
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   )
 }
