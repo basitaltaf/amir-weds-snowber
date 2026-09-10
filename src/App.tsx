@@ -267,10 +267,10 @@ function App() {
             onDragEnd={(_, info) => {
               if (info.offset.y < -20) setShowSlowNetworkWarning(false)
             }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-amber-200 flex items-center gap-2 cursor-grab active:cursor-grabbing w-11/12 max-w-sm sm:max-w-md md:w-auto"
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] bg-white/90 dark:bg-navy/95 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-amber-200 dark:border-amber-500/30 flex items-center gap-2 cursor-grab active:cursor-grabbing w-11/12 max-w-sm sm:max-w-md md:w-auto transition-colors"
           >
-            <RiWifiOffLine className="text-amber-500 w-5 h-5 flex-shrink-0" />
-            <span className="text-xs text-navy font-medium leading-tight">Slow connection. Media may take longer to load. (Swipe up to dismiss)</span>
+            <RiWifiOffLine className="text-amber-500 dark:text-amber-400 w-5 h-5 flex-shrink-0" />
+            <span className="text-xs text-navy dark:text-ivory/90 font-medium leading-tight">Slow connection. Media may take longer to load. (Swipe up to dismiss)</span>
           </motion.div>
         )}
       </AnimatePresence>

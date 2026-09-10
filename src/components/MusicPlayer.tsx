@@ -53,6 +53,22 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({ playRequested, config 
         })
         .catch((err) => {
           console.warn('Autoplay prevented by browser. Click to play.', err)
+          
+          // Fallback: wait for first interaction to resume
+          const resumeAudio = () => {
+            if (audioRef.current && isMounted && playRequested) {
+              audioRef.current.play().then(() => {
+                setIsPlaying(true)
+                document.removeEventListener('click', resumeAudio)
+                document.removeEventListener('touchstart', resumeAudio)
+                document.removeEventListener('keydown', resumeAudio)
+              }).catch(() => {})
+            }
+          }
+          
+          document.addEventListener('click', resumeAudio)
+          document.addEventListener('touchstart', resumeAudio)
+          document.addEventListener('keydown', resumeAudio)
         })
     } else if (!playRequested && audioRef.current) {
       audioRef.current.pause()
