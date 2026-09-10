@@ -143,12 +143,12 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-navy/95 z-[100] flex items-center justify-center p-4 select-none"
+              className="fixed inset-0 bg-ivory/95 z-[100] flex items-center justify-center p-4 select-none backdrop-blur-sm"
               onClick={() => setActiveImage(null)}
             >
               <button
                 onClick={() => setActiveImage(null)}
-                className="absolute top-6 right-6 text-ivory/80 hover:text-soft-gold p-2 bg-white/5 rounded-full backdrop-blur-md border border-white/10 hover:border-soft-gold/50 cursor-pointer transition-all duration-300 z-50"
+                className="absolute top-6 right-6 text-navy/70 hover:text-soft-gold p-2 bg-navy/5 rounded-full backdrop-blur-md border border-navy/10 hover:border-soft-gold/50 cursor-pointer transition-all duration-300 z-50"
               >
                 <RiCloseLine className="w-6 h-6" />
               </button>
@@ -164,10 +164,10 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
                 <img
                   src={activeImage === 'groom' ? groomImg : brideImg}
                   alt={activeImage === 'groom' ? groomLabel : brideLabel}
-                  className="max-w-full max-h-[75dvh] object-contain rounded-2xl border border-soft-gold/20 shadow-2xl"
+                  className="max-w-full max-h-[75dvh] object-contain rounded-2xl border border-soft-gold/30 shadow-[0_10px_40px_rgba(0,0,0,0.1)]"
                 />
                 
-                <p className="font-playfair text-ivory/90 tracking-widest uppercase text-center mt-6 text-sm sm:text-base font-bold">
+                <p className="font-playfair text-navy/90 tracking-widest uppercase text-center mt-6 text-sm sm:text-base font-bold">
                   {activeImage === 'groom' ? groomLabel : brideLabel}
                 </p>
               </motion.div>
