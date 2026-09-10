@@ -31,11 +31,9 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
           <h2 className="font-cormorant text-2xl sm:text-4xl text-soft-gold font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase">
             {currentLang === 'ur' ? 'دولہا اور دلہن' : 'The Bride & Groom'}
           </h2>
-          {/* Heart Separator */}
-          <div className="flex items-center justify-center gap-3 sm:gap-4 mt-5 sm:mt-6">
-            <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
-            <span className="text-[#A25050] text-sm animate-pulse">♥</span>
-            <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
+          {/* Separator */}
+          <div className="flex items-center justify-center mt-5 sm:mt-6">
+            <div className="h-[1px] w-24 sm:w-40 bg-soft-gold/40" />
           </div>
         </div>
 
@@ -82,11 +80,9 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
           </div>
         </motion.div>
 
-        {/* Bottom Heart Separator */}
-        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
-          <span className="text-[#A25050] text-sm animate-pulse">♥</span>
-          <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
+        {/* Bottom Separator */}
+        <div className="flex items-center justify-center mb-6 sm:mb-8">
+          <div className="h-[1px] w-24 sm:w-40 bg-soft-gold/40" />
         </div>
 
         {/* Quotes Section */}
@@ -97,7 +93,7 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
           transition={{ duration: 1, delay: 0.2 }}
           className="flex flex-col items-center gap-4 sm:gap-6"
         >
-          <h3 className="font-signature text-4xl sm:text-6xl text-[#A25050] tracking-wide" style={{ textShadow: '0 2px 10px rgba(162,80,80,0.1)' }}>
+          <h3 className="font-signature text-4xl sm:text-6xl text-red-600 tracking-wide" style={{ textShadow: '0 2px 10px rgba(220,38,38,0.1)' }}>
             Better Together
           </h3>
           <p className="font-cormorant text-soft-gold text-sm sm:text-lg tracking-widest font-medium px-4">
