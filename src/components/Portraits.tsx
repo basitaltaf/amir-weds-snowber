@@ -16,109 +16,94 @@ export const Portraits: React.FC<PortraitsProps> = ({ config }) => {
   const brideImg = config?.portraits?.bride || '/bride.png'
 
   return (
-    <section className="relative py-20 sm:py-32 px-4 sm:px-6 bg-ivory dark:bg-navy overflow-hidden flex flex-col items-center justify-center min-h-[600px] z-10 transition-colors duration-500">
+    <section className="relative py-16 sm:py-28 px-4 sm:px-6 bg-ivory overflow-hidden flex items-center justify-center min-h-[500px]">
       
-      {/* Background Soft Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-soft-gold/15 dark:bg-ivory/5 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none" />
+      {/* Background Celestial Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-soft-gold/10 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto relative z-20 text-center w-full flex flex-col items-center">
-        
-        {/* Header Title */}
-        <motion.h2 
+      {/* Decorative floral/dust particles */}
+      <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-soft-gold/40 rounded-full blur-[1px]" />
+      <div className="absolute bottom-1/4 right-1/3 w-1.5 h-1.5 bg-soft-gold/30 rounded-full blur-[1px]" />
+
+      <div className="max-w-3xl mx-auto relative z-10 text-center w-full">
+        {/* Section Title */}
+        <div className="mb-6 sm:mb-8">
+          <h2 className="font-cormorant text-2xl sm:text-4xl text-soft-gold font-semibold tracking-[0.15em] sm:tracking-[0.2em] uppercase">
+            {currentLang === 'ur' ? 'دولہا اور دلہن' : 'The Bride & Groom'}
+          </h2>
+          {/* Heart Separator */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4 mt-5 sm:mt-6">
+            <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
+            <span className="text-[#A25050] text-sm animate-pulse">♥</span>
+            <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
+          </div>
+        </div>
+
+        {/* Clean Minimalist Frames */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="font-cormorant text-3xl sm:text-5xl text-soft-gold font-semibold tracking-[0.15em] uppercase mb-4"
-        >
-          {currentLang === 'ur' ? 'دولہا اور دلہن' : 'The Bride & Groom'}
-        </motion.h2>
-
-        {/* Top Separator */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex items-center justify-center gap-3 w-full mb-10"
-        >
-          <div className="h-[1px] w-12 sm:w-24 bg-soft-gold/30 dark:bg-ivory/20" />
-          <span className="text-[#C55655] dark:text-[#E87A79] text-xs sm:text-sm">♥</span>
-          <div className="h-[1px] w-12 sm:w-24 bg-soft-gold/30 dark:bg-ivory/20" />
-        </motion.div>
-
-        {/* Glassmorphism Container for Photos */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 1 }}
-          className="relative bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-soft-gold/40 dark:border-soft-gold/20 shadow-[0_15px_40px_rgba(200,160,74,0.15)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.3)] rounded-3xl p-6 sm:p-10 w-full max-w-[90%] sm:max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-10"
+          className="border border-soft-gold/50 rounded-3xl p-3 sm:p-6 bg-ivory shadow-[0_5px_20px_rgba(200,160,74,0.05)] max-w-2xl mx-auto mb-8 sm:mb-10 relative"
         >
-          
-          {/* Groom Container */}
-          <div className="flex flex-col items-center group cursor-pointer w-full sm:w-1/2">
-            <div className="relative w-full aspect-[4/5] overflow-hidden rounded-xl bg-navy/5 shadow-md">
-              <img 
-                src={groomImg} 
-                alt={groomLabel} 
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none mix-blend-overlay" />
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
+            {/* Groom Photo */}
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-navy/5 shadow-sm border border-soft-gold/20 relative group">
+                <img 
+                  src={groomImg} 
+                  alt={groomLabel}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl pointer-events-none mix-blend-overlay" />
+              </div>
+              <span className="font-cormorant text-soft-gold text-sm sm:text-base tracking-[0.15em] uppercase font-bold">
+                {groomLabel}
+              </span>
             </div>
-            <span className="mt-5 font-playfair text-soft-gold text-sm sm:text-base tracking-[0.25em] font-bold uppercase block transition-colors duration-300">
-              {groomLabel}
-            </span>
-          </div>
 
-          {/* Bride Container */}
-          <div className="flex flex-col items-center group cursor-pointer w-full sm:w-1/2">
-            <div className="relative w-full aspect-[4/5] overflow-hidden rounded-xl bg-navy/5 shadow-md">
-              <img 
-                src={brideImg} 
-                alt={brideLabel} 
-                loading="lazy"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 ring-1 ring-inset ring-black/10 dark:ring-white/10 rounded-xl pointer-events-none mix-blend-overlay" />
+            {/* Bride Photo */}
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="w-full aspect-[4/5] rounded-2xl overflow-hidden bg-navy/5 shadow-sm border border-soft-gold/20 relative group">
+                <img 
+                  src={brideImg} 
+                  alt={brideLabel}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-2xl pointer-events-none mix-blend-overlay" />
+              </div>
+              <span className="font-cormorant text-soft-gold text-sm sm:text-base tracking-[0.15em] uppercase font-bold">
+                {brideLabel}
+              </span>
             </div>
-            <span className="mt-5 font-playfair text-soft-gold text-sm sm:text-base tracking-[0.25em] font-bold uppercase block transition-colors duration-300">
-              {brideLabel}
-            </span>
           </div>
-          
         </motion.div>
 
-        {/* Bottom Separator */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="flex items-center justify-center gap-3 w-full mt-12 mb-6"
-        >
-          <div className="h-[1px] w-16 sm:w-28 bg-soft-gold/30 dark:bg-ivory/20" />
-          <span className="text-[#C55655] dark:text-[#E87A79] text-sm sm:text-base">♥</span>
-          <div className="h-[1px] w-16 sm:w-28 bg-soft-gold/30 dark:bg-ivory/20" />
-        </motion.div>
+        {/* Bottom Heart Separator */}
+        <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
+          <span className="text-[#A25050] text-sm animate-pulse">♥</span>
+          <div className="h-[1px] w-12 sm:w-20 bg-soft-gold/40" />
+        </div>
 
-        {/* Footer Typography */}
+        {/* Quotes Section */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col items-center text-center space-y-4"
+          transition={{ duration: 1, delay: 0.2 }}
+          className="flex flex-col items-center gap-4 sm:gap-6"
         >
-          <h3 className="font-signature text-5xl sm:text-6xl text-[#E3B0B0] dark:text-[#E8BDBD] opacity-90 -rotate-2">
+          <h3 className="font-signature text-4xl sm:text-6xl text-[#A25050] tracking-wide" style={{ textShadow: '0 2px 10px rgba(162,80,80,0.1)' }}>
             Better Together
           </h3>
-          <p className="font-inter text-navy/60 dark:text-ivory/60 text-[9px] sm:text-[11px] tracking-[0.4em] uppercase font-semibold">
-            Different Stories, Same Destination
+          <p className="font-cormorant text-soft-gold text-sm sm:text-lg tracking-widest font-medium px-4">
+            "And We created you in pairs" Quran 78:8
           </p>
         </motion.div>
-        
       </div>
     </section>
   )
