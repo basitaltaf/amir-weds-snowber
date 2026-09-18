@@ -385,33 +385,12 @@ export const settingsApi = {
         }
         const parsed = data.config as WeddingConfig
         let updated = false
-        if (!parsed.dates || parsed.dates.mainDateEn === 'October 1 & 2, 2026') {
-          parsed.dates = DEFAULT_CONFIG.dates
-          parsed.events = DEFAULT_CONFIG.events
-          if (parsed.seo) {
-            parsed.seo.description = DEFAULT_CONFIG.seo.description
-          }
-          updated = true
-        }
-        if (parsed.gallery && parsed.gallery.some(g => g.src.includes('_17833') || g.src.includes('media__') || g.src.includes('couple_1'))) {
-          parsed.gallery = DEFAULT_CONFIG.gallery
-          parsed.portraits = DEFAULT_CONFIG.portraits
-          updated = true
-        }
-        if (!parsed.memorial) {
-          parsed.memorial = DEFAULT_CONFIG.memorial
-          updated = true
-        } else if (parsed.memorial.members) {
-          const hasDetails = parsed.memorial.members.some(m => m.includes('Of Groom'))
-          if (!hasDetails) {
-            parsed.memorial.members = DEFAULT_CONFIG.memorial!.members
-            updated = true
-          }
-        }
+        
         if (!parsed.emergencyContacts) {
           parsed.emergencyContacts = DEFAULT_CONFIG.emergencyContacts
           updated = true
         }
+
         if (updated) {
           await settingsApi.save(parsed)
         }
@@ -427,34 +406,12 @@ export const settingsApi = {
       }
       const parsed = JSON.parse(local) as WeddingConfig
       let updated = false
-      if (!parsed.dates || parsed.dates.mainDateEn === 'October 1 & 2, 2026') {
-        parsed.dates = DEFAULT_CONFIG.dates
-        parsed.events = DEFAULT_CONFIG.events
-        if (parsed.seo) {
-          parsed.seo.description = DEFAULT_CONFIG.seo.description
-        }
-        updated = true
-      }
-      // Automatically sanitize paths that reference old temporary artifacts to avoid broken images
-      if (parsed.gallery && parsed.gallery.some(g => g.src.includes('_17833') || g.src.includes('media__') || g.src.includes('couple_1'))) {
-        parsed.gallery = DEFAULT_CONFIG.gallery
-        parsed.portraits = DEFAULT_CONFIG.portraits
-        updated = true
-      }
-      if (!parsed.memorial) {
-        parsed.memorial = DEFAULT_CONFIG.memorial
-        updated = true
-      } else if (parsed.memorial.members) {
-        const hasDetails = parsed.memorial.members.some(m => m.includes('Of Groom'))
-        if (!hasDetails) {
-          parsed.memorial.members = DEFAULT_CONFIG.memorial!.members
-          updated = true
-        }
-      }
+      
       if (!parsed.emergencyContacts) {
         parsed.emergencyContacts = DEFAULT_CONFIG.emergencyContacts
         updated = true
       }
+
       if (updated) {
         localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(parsed))
       }
