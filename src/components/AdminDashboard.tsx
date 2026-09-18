@@ -70,10 +70,12 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
   // Fetch all RSVPs, Guestbook, and Guest Uploads entries
   const fetchData = async () => {
     try {
-      const rsvpRes = await rsvpApi.fetchAll()
-      const gbRes = await guestbookApi.fetchAll()
-      const uploadsRes = await guestUploadsApi.list()
-      const visitsRes = await visitsApi.fetchAll()
+      const [rsvpRes, gbRes, uploadsRes, visitsRes] = await Promise.all([
+        rsvpApi.fetchAll(),
+        guestbookApi.fetchAll(),
+        guestUploadsApi.list(),
+        visitsApi.fetchAll()
+      ])
       if (rsvpRes.success && rsvpRes.data) {
         setRsvpList(rsvpRes.data)
       }

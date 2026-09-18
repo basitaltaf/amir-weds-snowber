@@ -229,7 +229,7 @@ const LOCAL_STORAGE_RSVP_KEY = 'wedding_invitation_rsvps'
 const LOCAL_STORAGE_GUESTBOOK_KEY = 'wedding_invitation_guestbook'
 const LOCAL_STORAGE_SETTINGS_KEY = 'wedding_invitation_settings'
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const delay = (_ms: number) => Promise.resolve()
 
 export const rsvpApi = {
   submit: async (data: RSVPData): Promise<{ success: boolean; error?: any }> => {
