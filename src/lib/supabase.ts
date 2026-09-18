@@ -106,6 +106,10 @@ export interface WeddingConfig {
     name: string;
     phone: string;
   }>;
+  faqs?: Array<{
+    q: string;
+    a: string;
+  }>;
 }
 
 export const DEFAULT_CONFIG: WeddingConfig = {
@@ -222,6 +226,36 @@ export const DEFAULT_CONFIG: WeddingConfig = {
   emergencyContacts: [
     { name: 'Basit Altaf', phone: '+91 91499 12345' },
     { name: 'Arwa Altaf', phone: '+91 91499 54321' }
+  ],
+  faqs: [
+    {
+      q: "Can I share this invitation?",
+      a: "This invitation is intended exclusively for invited guests. If you wish to share it with someone else, please contact the host first."
+    },
+    {
+      q: "Can I take photos or videos?",
+      a: "Absolutely! We’d love for you to capture and cherish the beautiful moments. We kindly ask that you remain respectful and avoid disrupting the ceremony."
+    },
+    {
+      q: "What is the dress code?",
+      a: "Traditional, ethnic, or formal attire is warmly encouraged as we celebrate this special occasion together."
+    },
+    {
+      q: "Is parking available?",
+      a: "Yes, dedicated parking will be available near the venue. Our team will be happy to guide you upon arrival."
+    },
+    {
+      q: "What if I have dietary requirements?",
+      a: "If you have any food allergies or special dietary requirements, please mention them while submitting your RSVP or contact the host in advance."
+    },
+    {
+      q: "Will prayer facilities be available?",
+      a: "Yes, dedicated prayer facilities will be available throughout the event for the comfort and convenience of our guests."
+    },
+    {
+      q: "Can I get a similar website for ourselves?",
+      a: "Our family had a developer. Yours might need to hire one! 😜 Just kidding—we believe good ideas should be shared, so this wedding invitation will be completely open source.❤️"
+    }
   ]
 }
 
@@ -390,6 +424,11 @@ export const settingsApi = {
           parsed.emergencyContacts = DEFAULT_CONFIG.emergencyContacts
           updated = true
         }
+        
+        if (!parsed.faqs) {
+          parsed.faqs = DEFAULT_CONFIG.faqs
+          updated = true
+        }
 
         if (updated) {
           await settingsApi.save(parsed)
@@ -409,6 +448,11 @@ export const settingsApi = {
       
       if (!parsed.emergencyContacts) {
         parsed.emergencyContacts = DEFAULT_CONFIG.emergencyContacts
+        updated = true
+      }
+      
+      if (!parsed.faqs) {
+        parsed.faqs = DEFAULT_CONFIG.faqs
         updated = true
       }
 

@@ -2,39 +2,12 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RiAddLine, RiSubtractLine } from 'react-icons/ri'
 
-export const FAQ: React.FC = () => {
-  const [openIdx, setOpenIdx] = useState<number | null>(null)
+import type { WeddingConfig } from '../lib/supabase'
 
-  const faqData = [
-    {
-      q: "Can I share this invitation?",
-      a: "This invitation is intended exclusively for invited guests. If you wish to share it with someone else, please contact the host first."
-    },
-    {
-      q: "Can I take photos or videos?",
-      a: "Absolutely! We’d love for you to capture and cherish the beautiful moments. We kindly ask that you remain respectful and avoid disrupting the ceremony."
-    },
-    {
-      q: "What is the dress code?",
-      a: "Traditional, ethnic, or formal attire is warmly encouraged as we celebrate this special occasion together."
-    },
-    {
-      q: "Is parking available?",
-      a: "Yes, dedicated parking will be available near the venue. Our team will be happy to guide you upon arrival."
-    },
-    {
-      q: "What if I have dietary requirements?",
-      a: "If you have any food allergies or special dietary requirements, please mention them while submitting your RSVP or contact the host in advance."
-    },
-    {
-      q: "Will prayer facilities be available?",
-      a: "Yes, dedicated prayer facilities will be available throughout the event for the comfort and convenience of our guests."
-    },
-    {
-      q: "Can I get a similar website for ourselves?",
-      a: "Our family had a developer. Yours might need to hire one! 😜 Just kidding—we believe good ideas should be shared, so this wedding invitation will be completely open source.❤️"
-    }
-  ]
+export const FAQ: React.FC<{ config: WeddingConfig }> = ({ config }) => {
+  const [openIdx, setOpenIdx] = useState<number | null>(null)
+  
+  const faqData = config.faqs || []
 
   return (
     <section className="relative py-6 sm:py-8 px-6 bg-ivory overflow-hidden">

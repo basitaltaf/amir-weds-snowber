@@ -34,7 +34,7 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
   
   // Dashboard navigation states
   const [activeTab, setActiveTab] = useState<'rsvp' | 'guestbook' | 'uploads' | 'cms' | 'links' | 'analytics'>('rsvp')
-  const [cmsSection, setCmsSection] = useState<'details' | 'family' | 'events' | 'venue' | 'gallery' | 'music' | 'memorial' | 'emergency'>('details')  
+  const [cmsSection, setCmsSection] = useState<'details' | 'family' | 'events' | 'venue' | 'gallery' | 'music' | 'memorial' | 'emergency' | 'faqs'>('details')  
   // Database states
   const [rsvpList, setRsvpList] = useState<RSVPData[]>([])
   const [guestbookList, setGuestbookList] = useState<GuestbookEntry[]>([])
@@ -646,7 +646,7 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                 
                 {/* CMS Section Selection sub-menu */}
                 <div className="flex flex-wrap gap-2 border-b border-soft-gold/10 pb-3">
-                  {(['details', 'family', 'events', 'venue', 'gallery', 'music', 'memorial', 'emergency'] as const).map(section => (
+                  {(['details', 'family', 'events', 'venue', 'gallery', 'music', 'memorial', 'emergency', 'faqs'] as const).map(section => (
                     <button
                       key={section}
                       onClick={() => setCmsSection(section)}
@@ -1420,6 +1420,87 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                           className="w-full py-2 border border-dashed border-soft-gold/20 rounded-lg text-[10px] text-soft-gold uppercase tracking-wider font-semibold hover:bg-soft-gold/10 hover:border-soft-gold/40 transition-all cursor-pointer"
                         >
                           + Add New Emergency Contact
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CMS FAQs Panel */}
+                  {cmsSection === 'faqs' && (
+                    <div className="space-y-4">
+                      <h4 className="font-playfair text-soft-gold text-sm font-semibold mb-1">Frequently Asked Questions</h4>
+                      <p className="text-[9px] text-ivory/50 mb-3">Add or edit questions and answers for the FAQ section.</p>
+                      
+                      <div className="space-y-3">
+                        {(tempConfig.faqs || []).map((faq, idx) => (
+                          <div key={idx} className="bg-navy/40 border border-soft-gold/10 p-3 rounded-xl space-y-3 relative">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] text-soft-gold uppercase tracking-wider">FAQ #{idx + 1}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = (tempConfig.faqs || []).filter((_, i) => i !== idx)
+                                  setTempConfig({
+                                    ...tempConfig,
+                                    faqs: updated
+                                  })
+                                }}
+                                className="text-[10px] text-red-400 hover:text-red-300 font-bold cursor-pointer"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 gap-2">
+                              <div>
+                                <label className="text-[8px] text-ivory/50 uppercase tracking-widest block mb-1">Question</label>
+                                <input
+                                  type="text"
+                                  value={faq.q}
+                                  onChange={e => {
+                                    const updated = [...(tempConfig.faqs || [])]
+                                    updated[idx] = { ...updated[idx], q: e.target.value }
+                                    setTempConfig({
+                                      ...tempConfig,
+                                      faqs: updated
+                                    })
+                                  }}
+                                  className="w-full bg-navy/60 border border-soft-gold/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-hidden focus:border-soft-gold/40 text-ivory placeholder-ivory/30"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="text-[8px] text-ivory/50 uppercase tracking-widest block mb-1">Answer</label>
+                                <textarea
+                                  rows={2}
+                                  value={faq.a}
+                                  onChange={e => {
+                                    const updated = [...(tempConfig.faqs || [])]
+                                    updated[idx] = { ...updated[idx], a: e.target.value }
+                                    setTempConfig({
+                                      ...tempConfig,
+                                      faqs: updated
+                                    })
+                                  }}
+                                  className="w-full bg-navy/60 border border-soft-gold/15 rounded-lg px-2.5 py-1.5 text-xs focus:outline-hidden focus:border-soft-gold/40 text-ivory placeholder-ivory/30 resize-y"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = [...(tempConfig.faqs || []), { q: '', a: '' }]
+                            setTempConfig({
+                              ...tempConfig,
+                              faqs: updated
+                            })
+                          }}
+                          className="w-full py-2 border border-dashed border-soft-gold/20 rounded-lg text-[10px] text-soft-gold uppercase tracking-wider font-semibold hover:bg-soft-gold/10 hover:border-soft-gold/40 transition-all cursor-pointer"
+                        >
+                          + Add New FAQ
                         </button>
                       </div>
                     </div>

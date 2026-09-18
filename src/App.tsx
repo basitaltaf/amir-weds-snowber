@@ -345,7 +345,7 @@ function App() {
             <LuxuryDivider />
 
             {/* FAQ Accordion Section */}
-            <FAQ />
+            <FAQ config={config} />
 
             {/* Share & Thank you footer */}
             <Footer config={config} />
