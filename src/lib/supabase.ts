@@ -24,6 +24,7 @@ export interface GuestbookEntry {
   created_at?: string;
   name: string;
   message: string;
+  isHidden?: boolean;
 }
 
 export interface WeddingConfig {
@@ -109,6 +110,7 @@ export interface WeddingConfig {
   faqs?: Array<{
     q: string;
     a: string;
+    isHidden?: boolean;
   }>;
 }
 
@@ -397,6 +399,23 @@ export const guestbookApi = {
       localStorage.setItem(LOCAL_STORAGE_GUESTBOOK_KEY, JSON.stringify(filtered))
       return { success: true }
     }
+  },
+
+  toggleHidden: async (id: string, isHidden: boolean): Promise<{ success: boolean; error?: any }> => {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('guestbook').update({ isHidden }).eq('id', id)
+      if (error) {
+        console.error('Supabase guestbook hide/show error:', error)
+        return { success: false, error }
+      }
+      return { success: true }
+    } else {
+      await delay(200)
+      const existing = JSON.parse(localStorage.getItem(LOCAL_STORAGE_GUESTBOOK_KEY) || '[]')
+      const updated = existing.map((item: any) => item.id === id ? { ...item, isHidden } : item)
+      localStorage.setItem(LOCAL_STORAGE_GUESTBOOK_KEY, JSON.stringify(updated))
+      return { success: true }
+    }
   }
 }
 
@@ -498,6 +517,7 @@ export interface GuestUpload {
   image_url: string; // Base64 data-url or remote URL
   caption?: string;
   isPrivate?: boolean;
+  isHidden?: boolean;
 }
 
 const LOCAL_STORAGE_GUEST_UPLOADS_KEY = 'wedding_guest_uploads'
@@ -580,6 +600,23 @@ export const guestUploadsApi = {
       const existing = JSON.parse(localStorage.getItem(LOCAL_STORAGE_GUEST_UPLOADS_KEY) || '[]')
       const filtered = existing.filter((item: any) => item.id !== id)
       localStorage.setItem(LOCAL_STORAGE_GUEST_UPLOADS_KEY, JSON.stringify(filtered))
+      return { success: true }
+    }
+  },
+
+  toggleHidden: async (id: string, isHidden: boolean): Promise<{ success: boolean; error?: any }> => {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('guest_uploads').update({ isHidden }).eq('id', id)
+      if (error) {
+        console.error('Supabase guest_uploads hide/show error:', error)
+        return { success: false, error }
+      }
+      return { success: true }
+    } else {
+      await delay(200)
+      const existing = JSON.parse(localStorage.getItem(LOCAL_STORAGE_GUEST_UPLOADS_KEY) || '[]')
+      const updated = existing.map((item: any) => item.id === id ? { ...item, isHidden } : item)
+      localStorage.setItem(LOCAL_STORAGE_GUEST_UPLOADS_KEY, JSON.stringify(updated))
       return { success: true }
     }
   }

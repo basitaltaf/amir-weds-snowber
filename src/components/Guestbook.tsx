@@ -44,7 +44,7 @@ export const Guestbook: React.FC<GuestbookProps> = ({ t, onBlessingSuccess }) =>
     try {
       const response = await guestbookApi.fetchAll()
       if (response.success && response.data) {
-        setEntries(response.data)
+        setEntries(response.data.filter((entry) => !entry.isHidden))
       }
     } catch (err) {
       console.error('Error fetching guestbook:', err)

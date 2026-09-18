@@ -7,7 +7,7 @@ import type { WeddingConfig } from '../lib/supabase'
 export const FAQ: React.FC<{ config: WeddingConfig }> = ({ config }) => {
   const [openIdx, setOpenIdx] = useState<number | null>(null)
   
-  const faqData = config.faqs || []
+  const faqData = (config.faqs || []).filter(faq => !faq.isHidden)
 
   return (
     <section className="relative py-6 sm:py-8 px-6 bg-ivory overflow-hidden">

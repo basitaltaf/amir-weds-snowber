@@ -173,10 +173,17 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
   }
 
   const handleDeleteGuestbook = async (id: string) => {
-    if (!window.confirm('Remove this guestbook blessing entry?')) return
+    if (!window.confirm('Delete this guestbook entry?')) return
     const res = await guestbookApi.delete(id)
     if (res.success) {
       setGuestbookList(guestbookList.filter(item => item.id !== id))
+    }
+  }
+
+  const handleToggleGuestbookHidden = async (id: string, isHidden: boolean) => {
+    const res = await guestbookApi.toggleHidden(id, isHidden)
+    if (res.success) {
+      setGuestbookList(guestbookList.map(item => item.id === id ? { ...item, isHidden } : item))
     }
   }
 
@@ -185,6 +192,13 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
     const res = await guestUploadsApi.delete(id)
     if (res.success) {
       setGuestUploadsList(guestUploadsList.filter(item => item.id !== id))
+    }
+  }
+
+  const handleToggleUploadHidden = async (id: string, isHidden: boolean) => {
+    const res = await guestUploadsApi.toggleHidden(id, isHidden)
+    if (res.success) {
+      setGuestUploadsList(guestUploadsList.map(item => item.id === id ? { ...item, isHidden } : item))
     }
   }
 
@@ -546,7 +560,10 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                       <div key={entry.id || idx} className="bg-navy/40 backdrop-blur-sm border border-soft-gold/20 p-5 rounded-2xl flex items-start justify-between gap-4 hover:border-soft-gold/40 transition-colors shadow-sm">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
-                            <span className="font-playfair text-lg text-soft-gold font-bold">{entry.name}</span>
+                            <span className="font-playfair text-lg text-soft-gold font-bold">
+                              {entry.name}
+                              {entry.isHidden && <span className="ml-2 text-[9px] bg-red-900/50 text-red-200 px-2 py-0.5 rounded-full uppercase tracking-wider">Hidden</span>}
+                            </span>
                             <span className="text-[10px] text-ivory/50 tracking-wider">
                               {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : ''}
                             </span>
@@ -555,13 +572,26 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                             “{entry.message}”
                           </p>
                         </div>
-                        <button
-                          onClick={() => entry.id && handleDeleteGuestbook(entry.id)}
-                          disabled={!entry.id}
-                          className="px-2 py-1 bg-red-950/20 text-red-300 border border-red-900/10 rounded-lg text-[9px] font-semibold uppercase tracking-wider hover:bg-red-900 hover:text-white transition-colors cursor-pointer shrink-0 disabled:opacity-40"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex flex-col gap-2 shrink-0">
+                          <button
+                            onClick={() => entry.id && handleToggleGuestbookHidden(entry.id, !entry.isHidden)}
+                            disabled={!entry.id}
+                            className={`px-2 py-1 border rounded-lg text-[9px] font-semibold uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-40 ${
+                              entry.isHidden 
+                                ? 'bg-emerald-950/20 text-emerald-300 border-emerald-900/30 hover:bg-emerald-900 hover:text-white'
+                                : 'bg-amber-950/20 text-amber-300 border-amber-900/30 hover:bg-amber-900 hover:text-white'
+                            }`}
+                          >
+                            {entry.isHidden ? 'Show' : 'Hide'}
+                          </button>
+                          <button
+                            onClick={() => entry.id && handleDeleteGuestbook(entry.id)}
+                            disabled={!entry.id}
+                            className="px-2 py-1 bg-red-950/20 text-red-300 border border-red-900/10 rounded-lg text-[9px] font-semibold uppercase tracking-wider hover:bg-red-900 hover:text-white transition-colors cursor-pointer disabled:opacity-40"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     ))
                   )}
@@ -598,9 +628,17 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                               Private
                             </div>
                           )}
+                          {entry.isHidden && (
+                            <div className="absolute top-2 left-2 bg-red-950/90 backdrop-blur-sm text-red-300 border border-red-900/30 px-2 py-1 rounded-md text-[8px] font-bold tracking-widest uppercase">
+                              Hidden
+                            </div>
+                          )}
                         </div>
                         <div className="text-left space-y-1">
-                          <span className="text-[10px] text-soft-gold font-bold block truncate">{entry.guest_name}</span>
+                          <span className="text-[10px] text-soft-gold font-bold block truncate">
+                            {entry.guest_name}
+                            {entry.isHidden && <span className="ml-2 text-[8px] bg-red-900/50 text-red-200 px-1.5 py-0.5 rounded uppercase tracking-wider">Hidden</span>}
+                          </span>
                           {entry.caption && (
                             <p className="text-[9px] text-ivory/70 italic truncate">"{entry.caption}"</p>
                           )}
@@ -625,12 +663,21 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                             Save
                           </button>
                           <button
+                            onClick={() => entry.id && handleToggleUploadHidden(entry.id, !entry.isHidden)}
+                            className={`px-2.5 py-1.5 border rounded-lg text-[9px] font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                              entry.isHidden 
+                                ? 'bg-emerald-950/20 text-emerald-300 border-emerald-900/30 hover:bg-emerald-900 hover:text-white'
+                                : 'bg-amber-950/20 text-amber-300 border-amber-900/30 hover:bg-amber-900 hover:text-white'
+                            }`}
+                          >
+                            {entry.isHidden ? 'Show' : 'Hide'}
+                          </button>
+                          <button
                             onClick={() => entry.id && handleDeleteUpload(entry.id)}
-                            className="flex-1 py-1.5 bg-red-950/40 text-red-300 border border-red-900/20 rounded-lg text-[9px] font-semibold uppercase tracking-wider hover:bg-red-900 hover:text-white transition-colors cursor-pointer flex items-center justify-center gap-1"
+                            className="px-2.5 py-1.5 bg-red-950/40 text-red-300 border border-red-900/20 rounded-lg text-[9px] font-semibold uppercase tracking-wider hover:bg-red-900 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
                             title="Remove Photo"
                           >
                             <RiDeleteBin7Line className="w-3 h-3" />
-                            Del
                           </button>
                         </div>
                       </div>
@@ -1436,22 +1483,42 @@ export const AdminDashboard: React.FC<{ config: WeddingConfig; onConfigChange: (
                           <div key={idx} className="bg-navy/40 border border-soft-gold/10 p-3 rounded-xl space-y-3 relative">
                             <div className="flex items-center justify-between">
                               <span className="text-[9px] text-soft-gold uppercase tracking-wider">FAQ #{idx + 1}</span>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const updated = (tempConfig.faqs || []).filter((_, i) => i !== idx)
-                                  setTempConfig({
-                                    ...tempConfig,
-                                    faqs: updated
-                                  })
-                                }}
-                                className="text-[10px] text-red-400 hover:text-red-300 font-bold cursor-pointer"
-                              >
-                                Remove
-                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...(tempConfig.faqs || [])]
+                                    updated[idx] = { ...updated[idx], isHidden: !updated[idx].isHidden }
+                                    setTempConfig({
+                                      ...tempConfig,
+                                      faqs: updated
+                                    })
+                                  }}
+                                  className={`text-[10px] font-bold cursor-pointer px-2 py-0.5 rounded-full border ${
+                                    faq.isHidden 
+                                      ? 'bg-emerald-950/20 text-emerald-300 border-emerald-900/30' 
+                                      : 'bg-amber-950/20 text-amber-300 border-amber-900/30'
+                                  }`}
+                                >
+                                  {faq.isHidden ? 'Show' : 'Hide'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = (tempConfig.faqs || []).filter((_, i) => i !== idx)
+                                    setTempConfig({
+                                      ...tempConfig,
+                                      faqs: updated
+                                    })
+                                  }}
+                                  className="text-[10px] text-red-400 hover:text-red-300 font-bold cursor-pointer"
+                                >
+                                  Remove
+                                </button>
+                              </div>
                             </div>
                             
-                            <div className="grid grid-cols-1 gap-2">
+                            <div className={`grid grid-cols-1 gap-2 ${faq.isHidden ? 'opacity-50 grayscale' : ''}`}>
                               <div>
                                 <label className="text-[8px] text-ivory/50 uppercase tracking-widest block mb-1">Question</label>
                                 <input

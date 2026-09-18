@@ -43,7 +43,7 @@ export const Gallery: React.FC<GalleryProps> = ({ t, config }) => {
       setIsLoadingUploads(true)
       const res = await guestUploadsApi.list()
       if (res.success && res.data) {
-        setGuestUploads(res.data)
+        setGuestUploads(res.data.filter(u => !u.isHidden))
       }
       setIsLoadingUploads(false)
     }
